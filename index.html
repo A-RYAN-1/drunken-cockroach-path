@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Watch a drunken cockroach cross an 8x8 board: a backtracking search that visits every cell once, or a seeded random walk you can replay."
+    />
+    <title>Drunken Cockroach Path</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Drunken Cockroach Path</h1>
+        <p>
+          A cockroach on an 8x8 board. In <strong>Tour</strong> mode a backtracking search finds a
+          route through all 64 cells; in <strong>Random walk</strong> mode it staggers one cell at a
+          time, and the seed lets you replay the same night.
+        </p>
+      </header>
+
+      <div class="layout">
+        <canvas id="board" width="640" height="640" role="img" aria-label="The 8 by 8 board with the cockroach's path"></canvas>
+
+        <section class="panel" aria-label="Controls">
+          <fieldset>
+            <legend>Mode</legend>
+            <label><input type="radio" name="mode" value="tour" checked /> Tour (visit every cell once)</label>
+            <label><input type="radio" name="mode" value="walk" /> Random walk (up, down, left, right)</label>
+          </fieldset>
+
+          <div class="row">
+            <label for="start-x">Start x</label>
+            <input id="start-x" type="number" min="0" max="7" value="0" />
+            <label for="start-y">y</label>
+            <input id="start-y" type="number" min="0" max="7" value="0" />
+          </div>
+          <p class="hint">Or click a cell on the board.</p>
+
+          <div class="row" id="seed-row">
+            <label for="seed">Seed</label>
+            <input id="seed" type="number" min="0" max="4294967295" value="1" />
+            <button id="new-seed" type="button">Random</button>
+          </div>
+
+          <div class="row">
+            <label for="speed">Speed</label>
+            <input id="speed" type="range" min="1" max="200" value="8" />
+            <output id="speed-out" for="speed">8 steps/s</output>
+          </div>
+
+          <div class="buttons">
+            <button id="play" type="button" class="primary">Start</button>
+            <button id="step" type="button">Step</button>
+            <button id="reset" type="button">Reset</button>
+          </div>
+
+          <dl class="stats" aria-live="polite">
+            <div><dt>Steps</dt><dd id="stat-steps">0</dd></div>
+            <div><dt>Cells visited</dt><dd id="stat-cells">1 / 64</dd></div>
+            <div><dt>Position</dt><dd id="stat-pos">0, 0</dd></div>
+          </dl>
+          <p id="message" class="message" role="status"></p>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
