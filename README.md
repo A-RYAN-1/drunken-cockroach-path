@@ -240,9 +240,9 @@ The whole app is a static site on **Vercel Hobby (free)**, project `drunken-cock
 
 | Part | Host | Deploys | Variables the host needs |
 |---|---|---|---|
-| Static site (`dist/`) | Vercel | `vercel deploy --prod` from this folder | none |
+| Static site (`dist/`) | Vercel | automatically on every push to `main` (Git-linked); or `vercel deploy --prod` | none |
 
-Settings live in `vercel.json` (Vite framework, `npm run build`, output `dist`). Deploys are done with the CLI for now; the project is not yet linked to GitHub, so a push does not redeploy it.
+Settings live in `vercel.json` (Vite framework, `npm run build`, output `dist`). The project is linked to this GitHub repo, so every push to `main` redeploys production (checked 2026-10-17: the merge deployed in 5 seconds).
 
 Free-tier limits a visitor notices (checked 2026-10-17): none; it is static files, there is no sleep or cold start.
 
@@ -257,7 +257,7 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 
 ## Status and roadmap
 
-**Reached:** deployed free and checked on the live URL on 2026-10-17 (tour, random walk, seed replay, click-to-set-start). Runs locally on Windows with Node 22 (`npm run check` passes).
+**Reached:** deployed free, Git-linked, and checked on the live URL on 2026-10-17 (tour, random walk, seed replay, click-to-set-start). Runs locally on Windows with Node 22 (`npm run check` passes).
 
 **Known limitations**
 
@@ -268,7 +268,6 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 
 **Planned**
 
-- [ ] Link the Vercel project to GitHub so a push to `main` redeploys.
 - [ ] GitHub Actions workflow running `npm run check` on every push.
 - [ ] A board-size control and a "steps until every cell is covered" readout for the random walk.
 - [ ] Measure Lighthouse performance and accessibility and record the numbers here.
