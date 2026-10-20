@@ -1,0 +1,25 @@
+# Weekly version-update pull requests. Minor and patch updates are grouped into one PR per ecosystem;
+# a major version opens its own PR so one incompatible upgrade cannot block the rest.
+# TypeScript majors wait until typescript-eslint accepts them (its peer range rejects them, so
+# `npm ci` fails); ESLint and @eslint/js move together because each pins the other's major.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+    groups:
+      minor-and-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      eslint:
+        patterns: ["eslint", "@eslint/js"]
+        update-types: ["major"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
