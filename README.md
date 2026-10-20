@@ -199,7 +199,7 @@ vercel.json           build settings for the host
 | Lint and types | ESLint 9 and `tsc --noEmit` (strict) clean; both run in `npm run build` and `npm run check`. |
 | Dependencies | No runtime dependencies. `npm audit`: 0 vulnerabilities on 2026-10-17. |
 | Security | A static page: no input goes to a server. The seed and start cell are read from the URL hash, parsed as numbers and clamped to their ranges. |
-| CI | None yet (see Known limitations). |
+| CI | GitHub Actions runs lint, tests, the strict type check with the build, and `npm audit` (high and above) on every push and pull request; CodeQL scans the code and the workflows weekly and on every pull request; Dependabot opens grouped weekly update pull requests. |
 
 Run them:
 
@@ -263,12 +263,11 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 
 - The board is fixed at 8x8; the logic takes a size, the page does not offer one.
 - Tour mode ignores the seed: the search is deterministic, so there is one route per start cell.
-- No CI workflow yet, so the checks run on the developer's machine only.
 - The page was checked in Chrome only.
 
 **Planned**
 
-- [ ] GitHub Actions workflow running `npm run check` on every push.
+- [x] GitHub Actions workflow running the checks on every push (2026-10-20).
 - [ ] A board-size control and a "steps until every cell is covered" readout for the random walk.
 - [ ] Measure Lighthouse performance and accessibility and record the numbers here.
 
