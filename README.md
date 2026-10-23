@@ -58,8 +58,8 @@
 ## About
 
 A drunken cockroach crosses a tiled floor. Where does it go, and how long until it has touched every
-tile? This project answers it two ways on an 8x8 board and lets you watch both: **Tour** finds a route
-that visits all 64 tiles exactly once, and **Random walk** staggers one tile at a time in a random
+tile? This project answers it two ways on a square board (8x8 to begin with, up to 12x12) and lets you watch both: **Tour** finds a route
+that visits every tile exactly once, and **Random walk** staggers one tile at a time in a random
 direction and shows which tiles it keeps coming back to.
 
 It started as a college graphics program in C++ (`graphics.h`, Windows only). It is now a small web
@@ -86,8 +86,9 @@ Things to try in the first two minutes:
 
 ## Features
 
-- **Tour mode**: a backtracking search finds a path through all 64 cells and the board draws it step by step.
-  - Start from any cell, by clicking it or typing x and y (0 to 7).
+- **Board size**: 3x3 to 12x12 cells per side (8x8 by default), kept in the share link as `n`. The tour solves every start cell of every size in that range (measured 2026-10-23: worst 51 ms).
+- **Tour mode**: a backtracking search finds a path through every cell and the board draws it step by step.
+  - Start from any cell, by clicking it or typing x and y (0 to the board size minus 1).
   - Each cell shows its step number; the start is ringed and the current cell is outlined.
   - Reports "no path" instead of hanging if a start has no tour.
 - **Random walk mode**: one step up, down, left or right per tick, drawn uniformly among the moves that stay on the board.
@@ -95,7 +96,7 @@ Things to try in the first two minutes:
   - A trail of the last 250 steps shows the recent route.
 - **Seeded and replayable**: a seed (0 to 4294967295) fixes every random choice, so a run can be repeated or shared as a link.
 - **Playback controls**: Start, Pause and Resume, a single Step, Reset, and a speed slider from 1 to 200 steps per second.
-- **Live counters**: steps taken, cells visited out of 64, and the current position.
+- **Live counters**: steps taken, cells visited out of the board's total, and the current position.
 - **Light and dark themes** that follow the system setting, a layout that works down to phone width, and labelled controls.
 
 ## Why it exists
@@ -194,7 +195,7 @@ vercel.json           build settings for the host
 
 | Area | What is in place |
 |---|---|
-| Tests | 20 unit tests in 2 files, all passing on 2026-10-17. They cover: a tour exists from all 64 starts and visits every cell once with legal moves; the 7,6 case under each move order; the generator (same seed same sequence, range); the random walk (reproducible, legal moves only, never leaves the board, works from a corner); the simulation (reveal, finish, replay). |
+| Tests | 23 unit tests in 2 files, all passing on 2026-10-23. They cover: a tour exists from all 64 starts and visits every cell once with legal moves; the 7,6 case under each move order; the generator (same seed same sequence, range); the random walk (reproducible, legal moves only, never leaves the board, works from a corner); the simulation (reveal, finish, replay, a tour of 3x3, 5x5 and 12x12 boards, a walk kept on a 4x4 board). |
 | Browser check | A Playwright script drove the production build and the live site in Chrome on 2026-10-17: tour to 63 steps from two starts, step button, seed replay (same seed same position after 400 steps, different seed different), click-to-set-start, no page errors, no horizontal scroll at 375 px. |
 | Lint and types | ESLint 9 and `tsc --noEmit` (strict) clean; both run in `npm run build` and `npm run check`. |
 | Dependencies | No runtime dependencies. `npm audit`: 0 vulnerabilities on 2026-10-17. |
@@ -261,14 +262,14 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 
 **Known limitations**
 
-- The board is fixed at 8x8; the logic takes a size, the page does not offer one.
 - Tour mode ignores the seed: the search is deterministic, so there is one route per start cell.
 - The page was checked in Chrome only.
 
 **Planned**
 
 - [x] GitHub Actions workflow running the checks on every push (2026-10-20).
-- [ ] A board-size control and a "steps until every cell is covered" readout for the random walk.
+- [x] A board-size control, 3x3 to 12x12 (2026-10-23).
+- [ ] A "steps until every cell is covered" readout for the random walk.
 - [ ] Measure Lighthouse performance and accessibility and record the numbers here.
 
 ## Credits

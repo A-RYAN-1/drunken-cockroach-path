@@ -6,6 +6,8 @@ export interface Settings {
   mode: Mode;
   start: Cell;
   seed: number;
+  /** Cells per side; defaults to the 8x8 board. */
+  size?: number;
 }
 
 /**
@@ -19,14 +21,17 @@ export class Simulation {
   readonly path: Cell[];
   /** True when the tour mode has no path from the start cell. */
   readonly unsolvable: boolean;
+  /** Cells per side of this run's board. */
+  readonly size: number;
   private readonly rng: () => number;
   private readonly tour: Cell[] | null;
 
   constructor(settings: Settings) {
     this.settings = settings;
+    this.size = settings.size ?? SIZE;
     this.path = [settings.start];
     this.rng = createRng(settings.seed);
-    this.tour = settings.mode === 'tour' ? solveTour(settings.start) : null;
+    this.tour = settings.mode === 'tour' ? solveTour(settings.start, { size: this.size }) : null;
     this.unsolvable = settings.mode === 'tour' && this.tour === null;
   }
 
@@ -41,17 +46,17 @@ export class Simulation {
 
   /** The tour is finished when every cell is visited; a walk never finishes. */
   get done(): boolean {
-    return this.settings.mode === 'tour' && (this.unsolvable || this.path.length === SIZE * SIZE);
+    return this.settings.mode === 'tour' && (this.unsolvable || this.path.length === this.size ** 2);
   }
 
   get visitedCells(): number {
-    return visitCounts(this.path).flat().filter((n) => n > 0).length;
+    return visitCounts(this.path, this.size).flat().filter((n) => n > 0).length;
   }
 
   step(): boolean {
     if (this.done) return false;
     if (this.tour) this.path.push(this.tour[this.path.length]);
-    else this.path.push(randomStep(this.current, this.rng));
+    else this.path.push(randomStep(this.current, this.rng, this.size));
     return true;
   }
 }

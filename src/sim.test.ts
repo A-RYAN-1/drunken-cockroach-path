@@ -24,6 +24,29 @@ describe('Simulation (tour)', () => {
   });
 });
 
+describe('Simulation (board size)', () => {
+  it('tours every cell of a smaller and a larger board', () => {
+    for (const size of [3, 5, 12]) {
+      const sim = new Simulation({ mode: 'tour', start: { x: 1, y: 2 }, seed: 1, size });
+      while (sim.step());
+      expect(sim.size).toBe(size);
+      expect(sim.visitedCells).toBe(size * size);
+      expect(sim.unsolvable).toBe(false);
+    }
+  });
+
+  it('keeps a random walk on the chosen board', () => {
+    const sim = new Simulation({ mode: 'walk', start: { x: 0, y: 0 }, seed: 5, size: 4 });
+    for (let i = 0; i < 1000; i++) sim.step();
+    expect(sim.path.every((c) => c.x >= 0 && c.x < 4 && c.y >= 0 && c.y < 4)).toBe(true);
+    expect(sim.visitedCells).toBeLessThanOrEqual(16);
+  });
+
+  it('defaults to the 8x8 board', () => {
+    expect(new Simulation({ mode: 'walk', start, seed: 1 }).size).toBe(SIZE);
+  });
+});
+
 describe('Simulation (walk)', () => {
   it('replays the same walk from the same settings', () => {
     const a = new Simulation({ mode: 'walk', start, seed: 12 });
