@@ -1,5 +1,9 @@
 export const SIZE = 8;
 
+/** Smallest and largest board the page offers; the tour solves every start cell in this range. */
+export const MIN_SIZE = 3;
+export const MAX_SIZE = 12;
+
 export interface Cell {
   x: number;
   y: number;

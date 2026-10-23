@@ -1,4 +1,4 @@
-import { SIZE, visitCounts, type Cell } from './walk';
+import { visitCounts, type Cell } from './walk';
 import type { Simulation } from './sim';
 
 const TRAIL_LENGTH = 250;
@@ -18,17 +18,18 @@ export function draw(canvas: HTMLCanvasElement, sim: Simulation): void {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-  const cell = side / SIZE;
+  const size = sim.size;
+  const cell = side / size;
   const centre = (c: Cell) => ({ x: (c.x + 0.5) * cell, y: (c.y + 0.5) * cell });
 
   ctx.fillStyle = css('--board');
   ctx.fillRect(0, 0, side, side);
 
-  const counts = visitCounts(sim.path);
+  const counts = visitCounts(sim.path, size);
   const most = Math.max(1, ...counts.flat());
   const walk = sim.settings.mode === 'walk';
-  for (let y = 0; y < SIZE; y++) {
-    for (let x = 0; x < SIZE; x++) {
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
       const n = counts[y][x];
       if (n === 0) continue;
       ctx.globalAlpha = walk ? 0.18 + 0.72 * (n / most) : 0.55;
@@ -40,7 +41,7 @@ export function draw(canvas: HTMLCanvasElement, sim: Simulation): void {
 
   ctx.strokeStyle = css('--grid');
   ctx.lineWidth = 1;
-  for (let i = 0; i <= SIZE; i++) {
+  for (let i = 0; i <= size; i++) {
     ctx.beginPath();
     ctx.moveTo(i * cell, 0);
     ctx.lineTo(i * cell, side);
