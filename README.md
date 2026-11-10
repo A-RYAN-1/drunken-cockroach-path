@@ -82,6 +82,9 @@ Things to try in the first two minutes:
     <td width="50%"><img src="docs/images/tour-midway.png" alt="Tour mode after 30 steps: 31 cells numbered, the path still growing"><p align="center"><sub>Tour, 30 steps in: the path so far, current cell ringed (<a href="#the-two-modes">the two modes</a>)</sub></p></td>
     <td width="50%"><img src="docs/images/random-walk.png" alt="Random walk mode after 400 steps from cell 2,2 with seed 999: shaded tiles, a trail, 59 of 64 cells visited"><p align="center"><sub>Random walk, seed 999, 400 steps: 59 of 64 cells touched (<a href="#the-two-modes">the two modes</a>)</sub></p></td>
   </tr>
+  <tr>
+    <td colspan="2"><img src="docs/images/cover-readout.png" alt="Random walk on 8x8 from cell 2,2 with seed 999 after covering every cell, with the cover-time experiment table for 5x5, 12x12 and 8x8 below"><p align="center"><sub>Cover-time experiment: the walk covered all 64 cells at its step counter, and 100 walks per board are tabulated below (2026-11-10)</sub></p></td>
+  </tr>
 </table>
 
 ## Features
@@ -264,6 +267,7 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 **Known limitations**
 
 - Tour mode ignores the seed: the search is deterministic, so there is one route per start cell.
+- The cover-time figures come from 100 consecutive seeds per board (2026-11-10); they describe those seeds, not a proven expectation, and the experiment history is kept only until the page is reloaded.
 - The page was checked in Chrome only.
 
 **Planned**
