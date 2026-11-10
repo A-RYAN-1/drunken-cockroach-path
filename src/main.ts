@@ -1,6 +1,7 @@
 import './style.css';
 import { draw } from './render';
 import { Simulation, type Mode } from './sim';
+import { coverExperiment, summarise } from './coverage';
 import { MAX_SIZE, MIN_SIZE, SIZE } from './walk';
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -22,6 +23,8 @@ const stepBtn = $<HTMLButtonElement>('step');
 const message = $('message');
 const modeInputs = document.querySelectorAll<HTMLInputElement>('input[name="mode"]');
 
+const EXPERIMENT_RUNS = 100;
+const HISTORY_LIMIT = 8;
 const MAX_SEED = 2 ** 32 - 1;
 const SEED_RANGE = 1_000_000;
 const MAX_STEPS_PER_FRAME = 500;
@@ -82,6 +85,7 @@ function refresh() {
   $('stat-steps').textContent = String(sim.steps);
   $('stat-cells').textContent = `${sim.visitedCells} / ${sim.size ** 2}`;
   $('stat-pos').textContent = `${sim.current.x}, ${sim.current.y}`;
+  $('stat-cover').textContent = sim.coveredAt === null ? '-' : String(sim.coveredAt);
   if (sim.unsolvable) message.textContent = 'No path through every cell was found from this start.';
   else if (sim.done) message.textContent = `Done: every cell visited in ${sim.steps} steps.`;
   else message.textContent = '';
@@ -120,6 +124,51 @@ function toggle() {
   refresh();
   timer = requestAnimationFrame(frame);
 }
+
+interface HistoryRow {
+  size: number;
+  start: string;
+  seeds: string;
+  cells: string[];
+}
+const experiments: HistoryRow[] = [];
+
+function renderHistory() {
+  const body = document.querySelector('#exp-table tbody');
+  if (!body) return;
+  body.replaceChildren(
+    ...experiments.map((row) => {
+      const tr = document.createElement('tr');
+      [`${row.size}x${row.size}`, row.start, row.seeds, ...row.cells].forEach((text) => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        tr.append(td);
+      });
+      return tr;
+    }),
+  );
+  $('exp-table').hidden = experiments.length === 0;
+  $('exp-empty').hidden = experiments.length > 0;
+}
+
+$('run-exp').addEventListener('click', () => {
+  const { start } = sim.settings;
+  const first = sim.settings.seed;
+  const stats = summarise(coverExperiment(start, first, EXPERIMENT_RUNS, sim.size));
+  const fmt = (n: number) => String(Math.round(n));
+  experiments.unshift({
+    size: sim.size,
+    start: `${start.x}, ${start.y}`,
+    seeds: `${first} to ${first + EXPERIMENT_RUNS - 1}`,
+    cells: stats ? [stats.min, stats.median, stats.mean, stats.max].map(fmt) : ['-', '-', '-', '-'],
+  });
+  experiments.length = Math.min(experiments.length, HISTORY_LIMIT);
+  renderHistory();
+});
+$('clear-exp').addEventListener('click', () => {
+  experiments.length = 0;
+  renderHistory();
+});
 
 playBtn.addEventListener('click', toggle);
 stepBtn.addEventListener('click', () => {

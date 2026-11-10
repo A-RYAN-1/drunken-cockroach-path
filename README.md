@@ -37,7 +37,7 @@
 
 <p align="center"><sub>The finished tour from start cell (3, 4), 63 steps. Open it live: <a href="https://drunken-cockroach-path.vercel.app/#mode=tour&x=3&y=4">/#mode=tour&x=3&y=4</a>, then press Start.</sub></p>
 
-<p align="center"><sub>Last updated: 2026-10-17 &middot; Live on a free tier (Vercel); no backend, no database</sub></p>
+<p align="center"><sub>Last updated: 2026-11-10 &middot; Live on a free tier (Vercel); no backend, no database</sub></p>
 
 ---
 
@@ -96,7 +96,8 @@ Things to try in the first two minutes:
   - A trail of the last 250 steps shows the recent route.
 - **Seeded and replayable**: a seed (0 to 4294967295) fixes every random choice, so a run can be repeated or shared as a link.
 - **Playback controls**: Start, Pause and Resume, a single Step, Reset, and a speed slider from 1 to 200 steps per second.
-- **Live counters**: steps taken, cells visited out of the board's total, and the current position.
+- **Live counters**: steps taken, cells visited out of the board's total, the current position, and the step at which a random walk first covered every cell.
+- **Cover-time experiment**: one button runs 100 seeded walks (seeds counting up from the current one) from the current start on the current board and adds a row of min, median, mean and max steps to a history table, so boards can be compared. Measured 2026-11-10 from cell 0,0, seeds 1 to 100: median 27.5 steps on 3x3, 159 on 5x5, 684.5 on 8x8 and 1,976 on 12x12; 100 walks take 11 ms at 12x12.
 - **Light and dark themes** that follow the system setting, a layout that works down to phone width, and labelled controls.
 
 ## Why it exists
@@ -269,7 +270,7 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 
 - [x] GitHub Actions workflow running the checks on every push (2026-10-20).
 - [x] A board-size control, 3x3 to 12x12 (2026-10-23).
-- [ ] A "steps until every cell is covered" readout for the random walk.
+- [x] A "steps until every cell is covered" readout and a cover-time experiment for the random walk (2026-11-10).
 - [ ] Measure Lighthouse performance and accessibility and record the numbers here.
 
 ## Credits
