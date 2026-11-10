@@ -67,10 +67,31 @@
             <div><dt>Steps</dt><dd id="stat-steps">0</dd></div>
             <div><dt>Cells visited</dt><dd id="stat-cells">1 / 64</dd></div>
             <div><dt>Position</dt><dd id="stat-pos">0, 0</dd></div>
+            <div><dt>Covered at step</dt><dd id="stat-cover">-</dd></div>
           </dl>
           <p id="message" class="message" role="status"></p>
         </section>
       </div>
+
+      <section class="experiment" aria-labelledby="exp-title">
+        <h2 id="exp-title">Cover-time experiment</h2>
+        <p>
+          How many steps does a random walk need to stand on every cell? Run 100 walks on the current board and start
+          cell, seeds counting up from the seed above, and compare boards.
+        </p>
+        <div class="buttons">
+          <button id="run-exp" type="button" class="primary">Run 100 walks</button>
+          <button id="clear-exp" type="button">Clear history</button>
+        </div>
+        <p id="exp-empty" class="hint">No experiments yet.</p>
+        <table id="exp-table" hidden>
+          <caption class="visually-hidden">Cover time of past experiments, in steps</caption>
+          <thead>
+            <tr><th scope="col">Board</th><th scope="col">Start</th><th scope="col">Seeds</th><th scope="col">Min</th><th scope="col">Median</th><th scope="col">Mean</th><th scope="col">Max</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

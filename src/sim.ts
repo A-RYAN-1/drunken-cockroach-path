@@ -23,6 +23,8 @@ export class Simulation {
   readonly unsolvable: boolean;
   /** Cells per side of this run's board. */
   readonly size: number;
+  /** Step at which a walk first stood on every cell; null until then (and in tour mode). */
+  coveredAt: number | null = null;
   private readonly rng: () => number;
   private readonly tour: Cell[] | null;
 
@@ -56,7 +58,10 @@ export class Simulation {
   step(): boolean {
     if (this.done) return false;
     if (this.tour) this.path.push(this.tour[this.path.length]);
-    else this.path.push(randomStep(this.current, this.rng, this.size));
+    else {
+      this.path.push(randomStep(this.current, this.rng, this.size));
+      if (this.coveredAt === null && this.visitedCells === this.size ** 2) this.coveredAt = this.steps;
+    }
     return true;
   }
 }

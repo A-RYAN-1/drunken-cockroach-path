@@ -207,3 +207,35 @@ dd {
     grid-template-columns: 1fr;
   }
 }
+
+.experiment {
+  margin-top: 2rem;
+}
+
+.experiment table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 44rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.experiment th,
+.experiment td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.35rem 0.6rem;
+  text-align: right;
+}
+
+.experiment th:first-child,
+.experiment td:first-child {
+  text-align: left;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
