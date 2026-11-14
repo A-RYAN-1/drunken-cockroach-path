@@ -37,7 +37,7 @@
 
 <p align="center"><sub>The finished tour from start cell (3, 4), 63 steps. Open it live: <a href="https://drunken-cockroach-path.vercel.app/#mode=tour&x=3&y=4">/#mode=tour&x=3&y=4</a>, then press Start.</sub></p>
 
-<p align="center"><sub>Last updated: 2026-11-10 &middot; Live on a free tier (Vercel); no backend, no database</sub></p>
+<p align="center"><sub>Last updated: 2026-11-14 &middot; Live on a free tier (Vercel); no backend, no database</sub></p>
 
 ---
 
@@ -85,6 +85,9 @@ Things to try in the first two minutes:
   <tr>
     <td colspan="2"><img src="docs/images/cover-readout.png" alt="Random walk on 8x8 from cell 2,2 with seed 999 after covering every cell, with the cover-time experiment table for 5x5, 12x12 and 8x8 below"><p align="center"><sub>Cover-time experiment: the walk covered all 64 cells at its step counter, and 100 walks per board are tabulated below (2026-11-10)</sub></p></td>
   </tr>
+  <tr>
+    <td colspan="2"><img src="docs/images/keyboard-text.png" alt="Tour from cell 3,4 after 12 steps with the Text version of the board open, listing each move with a direction such as down-left or right"><p align="center"><sub>Keyboard and text alternative: the board takes arrow keys, and the disclosure below it lists the latest moves in words (2026-11-14)</sub></p></td>
+  </tr>
 </table>
 
 ## Features
@@ -101,6 +104,7 @@ Things to try in the first two minutes:
 - **Playback controls**: Start, Pause and Resume, a single Step, Reset, and a speed slider from 1 to 200 steps per second.
 - **Live counters**: steps taken, cells visited out of the board's total, the current position, and the step at which a random walk first covered every cell.
 - **Cover-time experiment**: one button runs 100 seeded walks (seeds counting up from the current one) from the current start on the current board and adds a row of min, median, mean and max steps to a history table, so boards can be compared. Measured 2026-11-10 from cell 0,0, seeds 1 to 100: median 27.5 steps on 3x3, 159 on 5x5, 684.5 on 8x8 and 1,976 on 12x12; 100 walks take 11 ms at 12x12.
+- **Keyboard and text alternative**: the board takes focus; the arrow keys move the start cell and Enter or Space starts or pauses. Its label states the mode, board, start, progress and position and updates as the run goes. A "Text version of the board" disclosure lists the latest 50 moves with a direction (up, down, left, right, or a pair such as down-left for the tour's diagonal steps).
 - **Light and dark themes** that follow the system setting, a layout that works down to phone width, and labelled controls.
 
 ## Why it exists
@@ -199,7 +203,7 @@ vercel.json           build settings for the host
 
 | Area | What is in place |
 |---|---|
-| Tests | 23 unit tests in 2 files, all passing on 2026-10-23. They cover: a tour exists from all 64 starts and visits every cell once with legal moves; the 7,6 case under each move order; the generator (same seed same sequence, range); the random walk (reproducible, legal moves only, never leaves the board, works from a corner); the simulation (reveal, finish, replay, a tour of 3x3, 5x5 and 12x12 boards, a walk kept on a 4x4 board). |
+| Tests | 36 unit tests in 4 files, all passing on 2026-11-14. They cover: a tour exists from all 64 starts and visits every cell once with legal moves; the 7,6 case under each move order; the generator (same seed same sequence, range); the random walk (reproducible, legal moves only, never leaves the board, works from a corner); the simulation (reveal, finish, replay, a tour of 3x3, 5x5 and 12x12 boards, a walk kept on a 4x4 board); the cover-time experiment; the canvas label and the text list of moves (direction words, diagonal tour moves, the 50-move cap). |
 | Browser check | A Playwright script drove the production build and the live site in Chrome on 2026-10-17: tour to 63 steps from two starts, step button, seed replay (same seed same position after 400 steps, different seed different), click-to-set-start, no page errors, no horizontal scroll at 375 px. |
 | Lint and types | ESLint 9 and `tsc --noEmit` (strict) clean; both run in `npm run build` and `npm run check`. |
 | Dependencies | No runtime dependencies. `npm audit`: 0 vulnerabilities on 2026-10-17. |
@@ -210,7 +214,7 @@ Run them:
 
 ```bash
 npm run lint     # ESLint
-npm test         # Vitest, 20 tests
+npm test         # Vitest, 36 tests
 npm run build    # type-check and production build into dist/
 npm run check    # all three
 ```
@@ -268,13 +272,15 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 
 - Tour mode ignores the seed: the search is deterministic, so there is one route per start cell.
 - The cover-time figures come from 100 consecutive seeds per board (2026-11-10); they describe those seeds, not a proven expectation, and the experiment history is kept only until the page is reloaded.
-- The page was checked in Chrome only.
+- The text version lists only the latest 50 moves, so the start of a long walk is not in the list.
+- The page was checked in Chrome only. axe-core found 0 violations on the live page on 2026-11-14, with the text version open and closed; that is an automated check, not a screen-reader test, and no Lighthouse run has been recorded.
 
 **Planned**
 
 - [x] GitHub Actions workflow running the checks on every push (2026-10-20).
 - [x] A board-size control, 3x3 to 12x12 (2026-10-23).
 - [x] A "steps until every cell is covered" readout and a cover-time experiment for the random walk (2026-11-10).
+- [x] Keyboard control and a text version of the board (2026-11-14).
 - [ ] Measure Lighthouse performance and accessibility and record the numbers here.
 
 ## Credits
