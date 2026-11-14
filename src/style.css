@@ -240,6 +240,10 @@ dd {
   white-space: nowrap;
 }
 
+#board-help {
+  margin-top: 0.5rem;
+}
+
 .text-view {
   margin-top: 1rem;
 }
