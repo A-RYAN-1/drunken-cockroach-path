@@ -15,6 +15,19 @@ describe('summary', () => {
 });
 
 describe('moves', () => {
+  it('names diagonal tour moves with both directions and never says jump', () => {
+    const sim = new Simulation({ mode: 'tour', start: { x: 3, y: 4 }, seed: 1 });
+    while (sim.step());
+    const list = moves(sim);
+    const last = sim.path[sim.path.length - 1];
+    const before = sim.path[sim.path.length - 2];
+    const word = (n: number, neg: string, pos: string) => (n < 0 ? neg : n > 0 ? pos : '');
+    const dir = [word(last.y - before.y, 'up', 'down'), word(last.x - before.x, 'left', 'right')].filter(Boolean).join('-');
+    expect(list[list.length - 1]).toBe(`Step 63: ${dir} to column ${last.x}, row ${last.y}`);
+    expect(list.some((m) => /(up|down)-(left|right)/.test(m))).toBe(true);
+    expect(list.some((m) => m.includes('jump'))).toBe(false);
+  });
+
   it('is empty before the first step', () => {
     expect(moves(walk())).toEqual([]);
   });
