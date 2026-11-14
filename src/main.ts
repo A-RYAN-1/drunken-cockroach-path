@@ -1,6 +1,7 @@
 import './style.css';
 import { draw } from './render';
 import { Simulation, type Mode } from './sim';
+import { moves, summary } from './describe';
 import { coverExperiment, summarise } from './coverage';
 import { MAX_SIZE, MIN_SIZE, SIZE } from './walk';
 
@@ -21,6 +22,7 @@ const speedOut = $('speed-out');
 const playBtn = $<HTMLButtonElement>('play');
 const stepBtn = $<HTMLButtonElement>('step');
 const message = $('message');
+const textView = $<HTMLDetailsElement>('text-view');
 const modeInputs = document.querySelectorAll<HTMLInputElement>('input[name="mode"]');
 
 const EXPERIMENT_RUNS = 100;
@@ -82,6 +84,8 @@ function build() {
 
 function refresh() {
   draw(canvas, sim);
+  canvas.setAttribute('aria-label', summary(sim));
+  if (textView.open) renderText();
   $('stat-steps').textContent = String(sim.steps);
   $('stat-cells').textContent = `${sim.visitedCells} / ${sim.size ** 2}`;
   $('stat-pos').textContent = `${sim.current.x}, ${sim.current.y}`;
@@ -92,6 +96,17 @@ function refresh() {
   playBtn.textContent = running ? 'Pause' : sim.steps > 0 ? 'Resume' : 'Start';
   playBtn.disabled = sim.done;
   stepBtn.disabled = sim.done;
+}
+
+function renderText() {
+  $('text-summary').textContent = summary(sim);
+  $('text-moves').replaceChildren(
+    ...moves(sim).map((text) => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      return li;
+    }),
+  );
 }
 
 function stop() {
@@ -191,6 +206,23 @@ canvas.addEventListener('click', (e) => {
   startX.value = String(clamp(Math.floor(((e.clientX - r.left) / r.width) * sim.size), 0, sim.size - 1));
   startY.value = String(clamp(Math.floor(((e.clientY - r.top) / r.height) * sim.size), 0, sim.size - 1));
   build();
+});
+textView.addEventListener('toggle', () => textView.open && renderText());
+const ARROWS: Record<string, [number, number]> = {
+  ArrowUp: [0, -1],
+  ArrowDown: [0, 1],
+  ArrowLeft: [-1, 0],
+  ArrowRight: [1, 0],
+};
+canvas.addEventListener('keydown', (e) => {
+  const arrow = ARROWS[e.key];
+  if (arrow) {
+    startX.value = String(clamp(sim.settings.start.x + arrow[0], 0, sim.size - 1));
+    startY.value = String(clamp(sim.settings.start.y + arrow[1], 0, sim.size - 1));
+    build();
+  } else if (e.key === 'Enter' || e.key === ' ') toggle();
+  else return;
+  e.preventDefault();
 });
 window.addEventListener('hashchange', () => {
   readHash();

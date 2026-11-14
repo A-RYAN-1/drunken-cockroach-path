@@ -22,7 +22,15 @@
       </header>
 
       <div class="layout">
-        <canvas id="board" width="640" height="640" role="img" aria-label="The board with the cockroach's path"></canvas>
+        <canvas
+          id="board"
+          width="640"
+          height="640"
+          tabindex="0"
+          role="application"
+          aria-label="Cockroach board"
+          aria-describedby="board-help"
+        ></canvas>
 
         <section class="panel" aria-label="Controls">
           <fieldset>
@@ -72,6 +80,15 @@
           <p id="message" class="message" role="status"></p>
         </section>
       </div>
+
+      <p id="board-help" class="hint">
+        Keyboard: focus the board, then use the arrow keys to move the start cell and Enter or Space to start or pause.
+      </p>
+      <details id="text-view" class="text-view">
+        <summary>Text version of the board</summary>
+        <p id="text-summary"></p>
+        <ol id="text-moves" tabindex="0" aria-label="Latest moves"></ol>
+      </details>
 
       <section class="experiment" aria-labelledby="exp-title">
         <h2 id="exp-title">Cover-time experiment</h2>
