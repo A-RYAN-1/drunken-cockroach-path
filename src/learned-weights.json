@@ -1,0 +1,37 @@
+{
+  "features": [
+    "onward",
+    "edgeDistance",
+    "centreDistance",
+    "deadEnds",
+    "onwardTimesProgress"
+  ],
+  "mean": [
+    4.468923,
+    0.897269,
+    0.322763,
+    0.018138,
+    1.875884
+  ],
+  "scale": [
+    1.577991,
+    0.740548,
+    0.131851,
+    0.133449,
+    1.188279
+  ],
+  "weights": [
+    4.332038,
+    -0.482251,
+    -0.092188,
+    0.001463,
+    1.782976
+  ],
+  "provenance": {
+    "trainedOn": "every start cell of boards 4, 5, 6, 7 (tours found with the Warnsdorff order)",
+    "decisions": 4325,
+    "method": "softmax over candidates, linear score, 600 full-batch steps, rate 0.2, L2 0.001, start at Warnsdorff weights; no randomness",
+    "meanLoss": 0.267831,
+    "date": "2026-11-16"
+  }
+}
