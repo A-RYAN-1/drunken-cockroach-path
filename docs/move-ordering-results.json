@@ -1,0 +1,373 @@
+{
+  "date": "2026-11-16",
+  "budget": 300000,
+  "weights": {
+    "features": [
+      "onward",
+      "edgeDistance",
+      "centreDistance",
+      "deadEnds",
+      "onwardTimesProgress"
+    ],
+    "mean": [
+      4.468923,
+      0.897269,
+      0.322763,
+      0.018138,
+      1.875884
+    ],
+    "scale": [
+      1.577991,
+      0.740548,
+      0.131851,
+      0.133449,
+      1.188279
+    ],
+    "weights": [
+      4.332038,
+      -0.482251,
+      -0.092188,
+      0.001463,
+      1.782976
+    ],
+    "provenance": {
+      "trainedOn": "every start cell of boards 4, 5, 6, 7 (tours found with the Warnsdorff order)",
+      "decisions": 4325,
+      "method": "softmax over candidates, linear score, 600 full-batch steps, rate 0.2, L2 0.001, start at Warnsdorff weights; no randomness",
+      "meanLoss": 0.267831,
+      "date": "2026-11-16"
+    }
+  },
+  "rows": [
+    {
+      "size": 3,
+      "order": "fixed",
+      "starts": 9,
+      "solved": 9,
+      "medianExtensions": 11,
+      "worstExtensions": 28,
+      "totalExtensions": 116,
+      "totalMs": 1,
+      "trained": false
+    },
+    {
+      "size": 3,
+      "order": "warnsdorff",
+      "starts": 9,
+      "solved": 9,
+      "medianExtensions": 8,
+      "worstExtensions": 8,
+      "totalExtensions": 72,
+      "totalMs": 0,
+      "trained": false
+    },
+    {
+      "size": 3,
+      "order": "learned",
+      "starts": 9,
+      "solved": 9,
+      "medianExtensions": 8,
+      "worstExtensions": 8,
+      "totalExtensions": 72,
+      "totalMs": 0,
+      "trained": false
+    },
+    {
+      "size": 4,
+      "order": "fixed",
+      "starts": 16,
+      "solved": 16,
+      "medianExtensions": 15,
+      "worstExtensions": 1174,
+      "totalExtensions": 1540,
+      "totalMs": 1,
+      "trained": false
+    },
+    {
+      "size": 4,
+      "order": "warnsdorff",
+      "starts": 16,
+      "solved": 16,
+      "medianExtensions": 15,
+      "worstExtensions": 15,
+      "totalExtensions": 240,
+      "totalMs": 1,
+      "trained": false
+    },
+    {
+      "size": 4,
+      "order": "learned",
+      "starts": 16,
+      "solved": 16,
+      "medianExtensions": 15,
+      "worstExtensions": 15,
+      "totalExtensions": 240,
+      "totalMs": 1,
+      "trained": true
+    },
+    {
+      "size": 5,
+      "order": "fixed",
+      "starts": 25,
+      "solved": 24,
+      "medianExtensions": 29,
+      "worstExtensions": 300032,
+      "totalExtensions": 300970,
+      "totalMs": 47,
+      "trained": false
+    },
+    {
+      "size": 5,
+      "order": "warnsdorff",
+      "starts": 25,
+      "solved": 25,
+      "medianExtensions": 24,
+      "worstExtensions": 24,
+      "totalExtensions": 600,
+      "totalMs": 1,
+      "trained": false
+    },
+    {
+      "size": 5,
+      "order": "learned",
+      "starts": 25,
+      "solved": 25,
+      "medianExtensions": 24,
+      "worstExtensions": 24,
+      "totalExtensions": 600,
+      "totalMs": 2,
+      "trained": true
+    },
+    {
+      "size": 6,
+      "order": "fixed",
+      "starts": 36,
+      "solved": 35,
+      "medianExtensions": 38,
+      "worstExtensions": 300070,
+      "totalExtensions": 304129,
+      "totalMs": 39,
+      "trained": false
+    },
+    {
+      "size": 6,
+      "order": "warnsdorff",
+      "starts": 36,
+      "solved": 36,
+      "medianExtensions": 35,
+      "worstExtensions": 35,
+      "totalExtensions": 1260,
+      "totalMs": 2,
+      "trained": false
+    },
+    {
+      "size": 6,
+      "order": "learned",
+      "starts": 36,
+      "solved": 36,
+      "medianExtensions": 35,
+      "worstExtensions": 35,
+      "totalExtensions": 1260,
+      "totalMs": 4,
+      "trained": true
+    },
+    {
+      "size": 7,
+      "order": "fixed",
+      "starts": 49,
+      "solved": 48,
+      "medianExtensions": 108,
+      "worstExtensions": 300097,
+      "totalExtensions": 312339,
+      "totalMs": 38,
+      "trained": false
+    },
+    {
+      "size": 7,
+      "order": "warnsdorff",
+      "starts": 49,
+      "solved": 49,
+      "medianExtensions": 48,
+      "worstExtensions": 48,
+      "totalExtensions": 2352,
+      "totalMs": 3,
+      "trained": false
+    },
+    {
+      "size": 7,
+      "order": "learned",
+      "starts": 49,
+      "solved": 49,
+      "medianExtensions": 48,
+      "worstExtensions": 48,
+      "totalExtensions": 2352,
+      "totalMs": 7,
+      "trained": true
+    },
+    {
+      "size": 8,
+      "order": "fixed",
+      "starts": 64,
+      "solved": 63,
+      "medianExtensions": 67,
+      "worstExtensions": 300140,
+      "totalExtensions": 370041,
+      "totalMs": 45,
+      "trained": false
+    },
+    {
+      "size": 8,
+      "order": "warnsdorff",
+      "starts": 64,
+      "solved": 63,
+      "medianExtensions": 63,
+      "worstExtensions": 300135,
+      "totalExtensions": 305649,
+      "totalMs": 89,
+      "trained": false
+    },
+    {
+      "size": 8,
+      "order": "learned",
+      "starts": 64,
+      "solved": 49,
+      "medianExtensions": 63,
+      "worstExtensions": 300126,
+      "totalExtensions": 4504954,
+      "totalMs": 1955,
+      "trained": false
+    },
+    {
+      "size": 9,
+      "order": "fixed",
+      "starts": 81,
+      "solved": 80,
+      "medianExtensions": 156,
+      "worstExtensions": 300182,
+      "totalExtensions": 575789,
+      "totalMs": 70,
+      "trained": false
+    },
+    {
+      "size": 9,
+      "order": "warnsdorff",
+      "starts": 81,
+      "solved": 80,
+      "medianExtensions": 80,
+      "worstExtensions": 300179,
+      "totalExtensions": 413530,
+      "totalMs": 116,
+      "trained": false
+    },
+    {
+      "size": 9,
+      "order": "learned",
+      "starts": 81,
+      "solved": 68,
+      "medianExtensions": 80,
+      "worstExtensions": 300165,
+      "totalExtensions": 3907585,
+      "totalMs": 1683,
+      "trained": false
+    },
+    {
+      "size": 10,
+      "order": "fixed",
+      "starts": 100,
+      "solved": 97,
+      "medianExtensions": 104,
+      "worstExtensions": 300235,
+      "totalExtensions": 910738,
+      "totalMs": 108,
+      "trained": false
+    },
+    {
+      "size": 10,
+      "order": "warnsdorff",
+      "starts": 100,
+      "solved": 95,
+      "medianExtensions": 99,
+      "worstExtensions": 300233,
+      "totalExtensions": 1510533,
+      "totalMs": 417,
+      "trained": false
+    },
+    {
+      "size": 10,
+      "order": "learned",
+      "starts": 100,
+      "solved": 81,
+      "medianExtensions": 99,
+      "worstExtensions": 300220,
+      "totalExtensions": 5712124,
+      "totalMs": 2565,
+      "trained": false
+    },
+    {
+      "size": 11,
+      "order": "fixed",
+      "starts": 121,
+      "solved": 109,
+      "medianExtensions": 491,
+      "worstExtensions": 300295,
+      "totalExtensions": 5792273,
+      "totalMs": 738,
+      "trained": false
+    },
+    {
+      "size": 11,
+      "order": "warnsdorff",
+      "starts": 121,
+      "solved": 115,
+      "medianExtensions": 120,
+      "worstExtensions": 300287,
+      "totalExtensions": 1815898,
+      "totalMs": 539,
+      "trained": false
+    },
+    {
+      "size": 11,
+      "order": "learned",
+      "starts": 121,
+      "solved": 104,
+      "medianExtensions": 120,
+      "worstExtensions": 300271,
+      "totalExtensions": 5117080,
+      "totalMs": 2343,
+      "trained": false
+    },
+    {
+      "size": 12,
+      "order": "fixed",
+      "starts": 144,
+      "solved": 141,
+      "medianExtensions": 149,
+      "worstExtensions": 300354,
+      "totalExtensions": 922000,
+      "totalMs": 110,
+      "trained": false
+    },
+    {
+      "size": 12,
+      "order": "warnsdorff",
+      "starts": 144,
+      "solved": 132,
+      "medianExtensions": 143,
+      "worstExtensions": 300352,
+      "totalExtensions": 3622949,
+      "totalMs": 1016,
+      "trained": false
+    },
+    {
+      "size": 12,
+      "order": "learned",
+      "starts": 144,
+      "solved": 105,
+      "medianExtensions": 143,
+      "worstExtensions": 300313,
+      "totalExtensions": 11724546,
+      "totalMs": 5339,
+      "trained": false
+    }
+  ]
+}

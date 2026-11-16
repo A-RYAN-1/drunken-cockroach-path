@@ -37,7 +37,7 @@
 
 <p align="center"><sub>The finished tour from start cell (3, 4), 63 steps. Open it live: <a href="https://drunken-cockroach-path.vercel.app/#mode=tour&x=3&y=4">/#mode=tour&x=3&y=4</a>, then press Start.</sub></p>
 
-<p align="center"><sub>Last updated: 2026-11-14 &middot; Live on a free tier (Vercel); no backend, no database</sub></p>
+<p align="center"><sub>Last updated: 2026-11-16 &middot; Live on a free tier (Vercel); no backend, no database</sub></p>
 
 ---
 
@@ -103,6 +103,7 @@ Things to try in the first two minutes:
 - **Seeded and replayable**: a seed (0 to 4294967295) fixes every random choice, so a run can be repeated or shared as a link.
 - **Playback controls**: Start, Pause and Resume, a single Step, Reset, and a speed slider from 1 to 200 steps per second.
 - **Live counters**: steps taken, cells visited out of the board's total, the current position, and the step at which a random walk first covered every cell.
+- **Move-ordering experiment (measured, not in the page)**: a small learned ordering of the search's next cell, fitted offline on solved tours of 4x4 to 7x7 boards, compared with Warnsdorff's rule and the original order on every start cell of 3x3 to 12x12 boards. Result, 2026-11-16: it matches Warnsdorff on the boards it trained on and is worse on larger ones (8x8: 49 of 64 start cells within the budget, against 63 for Warnsdorff; 12x12: 105 of 144 against 132), so the page keeps the original order with Warnsdorff as the fallback. Table and method: [docs/move-ordering-results.md](docs/move-ordering-results.md); regenerate with `npx tsx scripts/compare-orderings.ts`.
 - **Cover-time experiment**: one button runs 100 seeded walks (seeds counting up from the current one) from the current start on the current board and adds a row of min, median, mean and max steps to a history table, so boards can be compared. Measured 2026-11-10 from cell 0,0, seeds 1 to 100: median 27.5 steps on 3x3, 159 on 5x5, 684.5 on 8x8 and 1,976 on 12x12; 100 walks take 11 ms at 12x12.
 - **Keyboard and text alternative**: the board takes focus; the arrow keys move the start cell and Enter or Space starts or pauses. Its label states the mode, board, start, progress and position and updates as the run goes. A "Text version of the board" disclosure lists the latest 50 moves with a direction (up, down, left, right, or a pair such as down-left for the tour's diagonal steps).
 - **Light and dark themes** that follow the system setting, a layout that works down to phone width, and labelled controls.
@@ -203,10 +204,10 @@ vercel.json           build settings for the host
 
 | Area | What is in place |
 |---|---|
-| Tests | 36 unit tests in 4 files, all passing on 2026-11-14. They cover: a tour exists from all 64 starts and visits every cell once with legal moves; the 7,6 case under each move order; the generator (same seed same sequence, range); the random walk (reproducible, legal moves only, never leaves the board, works from a corner); the simulation (reveal, finish, replay, a tour of 3x3, 5x5 and 12x12 boards, a walk kept on a 4x4 board); the cover-time experiment; the canvas label and the text list of moves (direction words, diagonal tour moves, the 50-move cap). |
+| Tests | 43 unit tests in 5 files, all passing on 2026-11-16. The move-ordering tests check the features, that the weights file matches the training script, and that the learned order still returns real tours. They cover: a tour exists from all 64 starts and visits every cell once with legal moves; the 7,6 case under each move order; the generator (same seed same sequence, range); the random walk (reproducible, legal moves only, never leaves the board, works from a corner); the simulation (reveal, finish, replay, a tour of 3x3, 5x5 and 12x12 boards, a walk kept on a 4x4 board); the cover-time experiment; the canvas label and the text list of moves (direction words, diagonal tour moves, the 50-move cap). |
 | Browser check | A Playwright script drove the production build and the live site in Chrome on 2026-10-17: tour to 63 steps from two starts, step button, seed replay (same seed same position after 400 steps, different seed different), click-to-set-start, no page errors, no horizontal scroll at 375 px. |
 | Lint and types | ESLint 9 and `tsc --noEmit` (strict) clean; both run in `npm run build` and `npm run check`. |
-| Dependencies | No runtime dependencies. `npm audit`: 0 vulnerabilities on 2026-10-17. |
+| Dependencies | No runtime dependencies (the experiment scripts add `tsx` as a dev dependency). `npm audit`: 0 vulnerabilities on 2026-10-17. |
 | Security | A static page: no input goes to a server. The seed and start cell are read from the URL hash, parsed as numbers and clamped to their ranges. |
 | CI | GitHub Actions runs lint, tests, the strict type check with the build, and `npm audit` (high and above) on every push and pull request; CodeQL scans the code and the workflows weekly and on every pull request; Dependabot opens grouped weekly update pull requests. |
 
@@ -270,6 +271,7 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 
 **Known limitations**
 
+- The learned move ordering is a negative result from one linear model with five features and one training recipe tried twice (2026-11-16); a richer model or other features might do better, and it was not tried. The page does not use it.
 - Tour mode ignores the seed: the search is deterministic, so there is one route per start cell.
 - The cover-time figures come from 100 consecutive seeds per board (2026-11-10); they describe those seeds, not a proven expectation, and the experiment history is kept only until the page is reloaded.
 - The text version lists only the latest 50 moves, so the start of a long walk is not in the list.
@@ -281,6 +283,7 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 - [x] A board-size control, 3x3 to 12x12 (2026-10-23).
 - [x] A "steps until every cell is covered" readout and a cover-time experiment for the random walk (2026-11-10).
 - [x] Keyboard control and a text version of the board (2026-11-14).
+- [x] Learned move ordering compared with Warnsdorff: measured, did not win (2026-11-16).
 - [ ] Measure Lighthouse performance and accessibility and record the numbers here.
 
 ## Credits

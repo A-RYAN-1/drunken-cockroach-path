@@ -1,3 +1,5 @@
+import { features, score, type OrderingWeights } from './ordering';
+
 export const SIZE = 8;
 
 /** Smallest and largest board the page offers; the tour solves every start cell in this range. */
@@ -45,7 +47,9 @@ export interface TourOptions {
    * budget: the original order explodes from one start cell (7,6) and
    * Warnsdorff from another (4,2), so together they cover the whole board.
    */
-  order?: 'auto' | 'fixed' | 'warnsdorff';
+  order?: 'auto' | 'fixed' | 'warnsdorff' | 'learned';
+  /** Weights for the "learned" order; defaults to the trained file in src/learned-weights.json. */
+  model?: OrderingWeights;
   /** Give up (return null) after this many extensions, per ordering tried. */
   budget?: number;
 }
@@ -57,13 +61,24 @@ export interface TourOptions {
  * when no such path starts at `start` or the budget ran out.
  */
 export function solveTour(start: Cell, options: TourOptions = {}): Cell[] | null {
-  const { size = SIZE, order = 'auto', budget = TOUR_BUDGET } = options;
-  if (!inBounds(start, size)) return null;
+  return solveTourStats(start, options).path;
+}
+
+export interface TourStats {
+  path: Cell[] | null;
+  /** Extensions tried, summed over the orderings an "auto" run used. */
+  extensions: number;
+}
+
+/** solveTour that also reports how much search it took, for comparing orderings. */
+export function solveTourStats(start: Cell, options: TourOptions = {}): TourStats {
+  const { size = SIZE, order = 'auto', budget = TOUR_BUDGET, model } = options;
+  if (!inBounds(start, size)) return { path: null, extensions: 0 };
   if (order === 'auto') {
-    return (
-      solveTour(start, { size, order: 'fixed', budget }) ??
-      solveTour(start, { size, order: 'warnsdorff', budget })
-    );
+    const first = solveTourStats(start, { size, order: 'fixed', budget });
+    if (first.path) return first;
+    const second = solveTourStats(start, { size, order: 'warnsdorff', budget });
+    return { path: second.path, extensions: first.extensions + second.extensions };
   }
   const visited = Array.from({ length: size }, () => new Array<boolean>(size).fill(false));
   const path: Cell[] = [start];
@@ -80,6 +95,16 @@ export function solveTour(start: Cell, options: TourOptions = {}): Cell[] | null
     if (++used > budget) return false;
     const next = neighbours(at);
     if (order === 'warnsdorff') next.sort((a, b) => onward(a) - onward(b));
+    else if (order === 'learned') {
+      const placed = path.length;
+      const keyed = next.map((c) => ({ c, key: score(features(c, neighbours, size, placed), model) }));
+      keyed.sort((a, b) => a.key - b.key);
+      return tryAll(keyed.map((k) => k.c));
+    }
+    return tryAll(next);
+  };
+
+  const tryAll = (next: Cell[]): boolean => {
     for (const c of next) {
       visited[c.y][c.x] = true;
       path.push(c);
@@ -90,7 +115,7 @@ export function solveTour(start: Cell, options: TourOptions = {}): Cell[] | null
     return false;
   };
 
-  return extend(start) ? path : null;
+  return { path: extend(start) ? path : null, extensions: used };
 }
 
 /** mulberry32: a small seeded generator, so a run can be reproduced. */
