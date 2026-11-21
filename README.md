@@ -37,7 +37,7 @@
 
 <p align="center"><sub>The finished tour from start cell (3, 4), 63 steps. Open it live: <a href="https://drunken-cockroach-path.vercel.app/#mode=tour&x=3&y=4">/#mode=tour&x=3&y=4</a>, then press Start.</sub></p>
 
-<p align="center"><sub>Last updated: 2026-11-16 &middot; Live on a free tier (Vercel); no backend, no database</sub></p>
+<p align="center"><sub>Last updated: 2026-11-21 &middot; Live on a free tier (Vercel); no backend, no database</sub></p>
 
 ---
 
@@ -74,8 +74,9 @@ Things to try in the first two minutes:
 
 1. Press **Start** in Tour mode. The cockroach walks from cell (0, 0), numbering each tile; at 63 steps every tile is covered.
 2. Click any cell on the board to change the start, then press Start again. All 64 start cells work, including (7, 6), where the original program's move order never finishes (see [Design decisions](#design-decisions)).
-3. Switch to **Random walk**, drag **Speed** to 200 steps/s and watch the heat map fill in: darker tiles are visited more often.
+3. Switch to **Random walk**, set **Speed** to 8x and watch the heat map fill in: darker tiles are visited more often.
 4. Type a **Seed**, press Reset and Start, then Reset and Start again: the walk repeats exactly. Press **Random** for a new seed, or share the address bar, which carries the seed.
+5. After a run, drag **Replay** or press comma and full stop to step back and forward; the move list under the board follows and marks the current step.
 
 <table>
   <tr>
@@ -84,6 +85,9 @@ Things to try in the first two minutes:
   </tr>
   <tr>
     <td colspan="2"><img src="docs/images/cover-readout.png" alt="Random walk on 8x8 from cell 2,2 with seed 999 after covering every cell, with the cover-time experiment table for 5x5, 12x12 and 8x8 below"><p align="center"><sub>Cover-time experiment: the walk covered all 64 cells at its step counter, and 100 walks per board are tabulated below (2026-11-10)</sub></p></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/images/replay-controls.png" alt="Tour from cell 3,4 scrubbed back to step 30 of 63: the board shows 31 numbered cells, the Replay slider sits at 30 of 63, and the move list below has Step 30 in bold"><p align="center"><sub>Replay controls: the Replay slider, Back and Step buttons and a speed from 0.25x to 8x; the move list marks the step the board is on (2026-11-21)</sub></p></td>
   </tr>
   <tr>
     <td colspan="2"><img src="docs/images/keyboard-text.png" alt="Tour from cell 3,4 after 12 steps with the Text version of the board open, listing each move with a direction such as down-left or right"><p align="center"><sub>Keyboard and text alternative: the board takes arrow keys, and the disclosure below it lists the latest moves in words (2026-11-14)</sub></p></td>
@@ -101,11 +105,12 @@ Things to try in the first two minutes:
   - Cells shade by how often they have been visited.
   - A trail of the last 250 steps shows the recent route.
 - **Seeded and replayable**: a seed (0 to 4294967295) fixes every random choice, so a run can be repeated or shared as a link.
-- **Playback controls**: Start, Pause and Resume, a single Step, Reset, and a speed slider from 1 to 200 steps per second.
+- **Playback controls**: Start, Pause and Resume, Step, Back, Reset, and a speed from 0.25x to 8x (10 steps per second at 1x, so 2.5 to 80).
+- **Replay**: a slider seeks to any step that exists, Back and Step move one step, and Home and End jump to the start and the end. The tour is solved up front, so the slider covers all 63 steps at once; a walk is drawn from the seeded generator the first time the cursor reaches a step and kept, so going back and forward again shows the same walk. The cover step shows only once the replay has reached it.
 - **Live counters**: steps taken, cells visited out of the board's total, the current position, and the step at which a random walk first covered every cell.
 - **Move-ordering experiment (measured, not in the page)**: a small learned ordering of the search's next cell, fitted offline on solved tours of 4x4 to 7x7 boards, compared with Warnsdorff's rule and the original order on every start cell of 3x3 to 12x12 boards. Result, 2026-11-16: it matches Warnsdorff on the boards it trained on and is worse on larger ones (8x8: 49 of 64 start cells within the budget, against 63 for Warnsdorff; 12x12: 105 of 144 against 132), so the page keeps the original order with Warnsdorff as the fallback. Table and method: [docs/move-ordering-results.md](docs/move-ordering-results.md); regenerate with `npx tsx scripts/compare-orderings.ts`.
 - **Cover-time experiment**: one button runs 100 seeded walks (seeds counting up from the current one) from the current start on the current board and adds a row of min, median, mean and max steps to a history table, so boards can be compared. Measured 2026-11-10 from cell 0,0, seeds 1 to 100: median 27.5 steps on 3x3, 159 on 5x5, 684.5 on 8x8 and 1,976 on 12x12; 100 walks take 11 ms at 12x12.
-- **Keyboard and text alternative**: the board takes focus; the arrow keys move the start cell and Enter or Space starts or pauses. Its label states the mode, board, start, progress and position and updates as the run goes. A "Text version of the board" disclosure lists the latest 50 moves with a direction (up, down, left, right, or a pair such as down-left for the tour's diagonal steps).
+- **Keyboard and text alternative**: the board takes focus; the arrow keys move the start cell and Enter or Space starts or pauses. Outside form fields, comma and full stop step back and forward, Home and End jump to the start and end, and the square brackets change the speed. Its label states the mode, board, start, progress and position and updates as the run goes. A "Text version of the board" disclosure lists 50 moves around the current step (the latest 50 while the replay is at the end) with a direction (up, down, left, right, or a pair such as down-left for the tour's diagonal steps).
 - **Light and dark themes** that follow the system setting, a layout that works down to phone width, and labelled controls.
 
 ## Why it exists
@@ -137,18 +142,18 @@ sequenceDiagram
     User->>Main: Start
     loop every animation frame
         Main->>Main: steps owed = elapsed time x speed
-        Main->>Sim: step() for each owed step
+        Main->>Sim: step() for each owed step (the cursor moves; Back and the slider move it too)
         alt Tour
-            Sim->>Sim: reveal next cell of the solved path
+            Sim->>Sim: show the next cell of the solved path
         else Random walk
-            Sim->>Walk: randomStep(current, seeded generator)
+            Sim->>Walk: randomStep(last generated cell, seeded generator), only past the furthest step
             Walk-->>Sim: next cell
         end
         Main->>Draw: draw(canvas, simulation)
     end
 ```
 
-The speed slider sets steps per second, not steps per frame, so the pace is the same on a 60 Hz and a 144 Hz screen.
+The speed sets steps per second, not steps per frame, so the pace is the same on a 60 Hz and a 144 Hz screen.
 
 ### The two modes
 
@@ -204,7 +209,7 @@ vercel.json           build settings for the host
 
 | Area | What is in place |
 |---|---|
-| Tests | 43 unit tests in 5 files, all passing on 2026-11-16. The move-ordering tests check the features, that the weights file matches the training script, and that the learned order still returns real tours. They cover: a tour exists from all 64 starts and visits every cell once with legal moves; the 7,6 case under each move order; the generator (same seed same sequence, range); the random walk (reproducible, legal moves only, never leaves the board, works from a corner); the simulation (reveal, finish, replay, a tour of 3x3, 5x5 and 12x12 boards, a walk kept on a 4x4 board); the cover-time experiment; the canvas label and the text list of moves (direction words, diagonal tour moves, the 50-move cap). |
+| Tests | 60 unit tests in 6 files, all passing on 2026-11-21. The move-ordering tests check the features, that the weights file matches the training script, and that the learned order still returns real tours. They cover: a tour exists from all 64 starts and visits every cell once with legal moves; the 7,6 case under each move order; the generator (same seed same sequence, range); the random walk (reproducible, legal moves only, never leaves the board, works from a corner); the simulation (reveal, finish, replay, a tour of 3x3, 5x5 and 12x12 boards, a walk kept on a 4x4 board, the replay cursor: the step shown equals the solver move at every index, a walk unchanged after going back); the replay helpers (speeds, key map, move window); the cover-time experiment; the canvas label and the text list of moves (direction words, diagonal tour moves, the 50-move cap). |
 | Browser check | A Playwright script drove the production build and the live site in Chrome on 2026-10-17: tour to 63 steps from two starts, step button, seed replay (same seed same position after 400 steps, different seed different), click-to-set-start, no page errors, no horizontal scroll at 375 px. |
 | Lint and types | ESLint 9 and `tsc --noEmit` (strict) clean; both run in `npm run build` and `npm run check`. |
 | Dependencies | No runtime dependencies (the experiment scripts add `tsx` as a dev dependency). `npm audit`: 0 vulnerabilities on 2026-10-17. |
@@ -274,7 +279,8 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 - The learned move ordering is a negative result from one linear model with five features and one training recipe tried twice (2026-11-16); a richer model or other features might do better, and it was not tried. The page does not use it.
 - Tour mode ignores the seed: the search is deterministic, so there is one route per start cell.
 - The cover-time figures come from 100 consecutive seeds per board (2026-11-10); they describe those seeds, not a proven expectation, and the experiment history is kept only until the page is reloaded.
-- The text version lists only the latest 50 moves, so the start of a long walk is not in the list.
+- The text version lists 50 moves at a time, around the current step, so the whole of a long walk is not in the list at once; the Replay slider reaches every step.
+- The top speed is 80 steps per second; before 2026-11-21 the slider went to 200. A walk has no steps to jump to beyond the furthest one reached, so its slider ends there.
 - The page was checked in Chrome only. axe-core found 0 violations on the live page on 2026-11-14, with the text version open and closed; that is an automated check, not a screen-reader test, and no Lighthouse run has been recorded.
 
 **Planned**
@@ -284,6 +290,7 @@ Free-tier limits a visitor notices (checked 2026-10-17): none; it is static file
 - [x] A "steps until every cell is covered" readout and a cover-time experiment for the random walk (2026-11-10).
 - [x] Keyboard control and a text version of the board (2026-11-14).
 - [x] Learned move ordering compared with Warnsdorff: measured, did not win (2026-11-16).
+- [x] Replay controls: step back and forward, a scrubber and a 0.25x to 8x speed (2026-11-21).
 - [ ] Measure Lighthouse performance and accessibility and record the numbers here.
 
 ## Credits
