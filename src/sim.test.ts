@@ -66,3 +66,81 @@ describe('Simulation (walk)', () => {
     expect(sim.visitedCells).toBeLessThanOrEqual(SIZE * SIZE);
   });
 });
+
+describe('Simulation (replay cursor)', () => {
+  it('shows the solver move at every index, whichever way the cursor got there', () => {
+    const sim = new Simulation({ mode: 'tour', start, seed: 1 });
+    const tour = [...sim.fullPath];
+    expect(tour).toHaveLength(SIZE * SIZE);
+    for (let i = 0; i < tour.length; i++) {
+      sim.seek(i);
+      expect(sim.steps).toBe(i);
+      expect(sim.current).toEqual(tour[i]);
+      expect(sim.path).toEqual(tour.slice(0, i + 1));
+    }
+    for (let i = tour.length - 1; i >= 0; i--) {
+      expect(sim.current).toEqual(tour[i]);
+      sim.back();
+    }
+    expect(sim.steps).toBe(0);
+    expect(sim.back()).toBe(false);
+  });
+
+  it('is done only on the last cell and can be replayed after stepping back', () => {
+    const sim = new Simulation({ mode: 'tour', start, seed: 1 });
+    sim.seek(SIZE * SIZE - 1);
+    expect(sim.done).toBe(true);
+    expect(sim.step()).toBe(false);
+    sim.back();
+    expect(sim.done).toBe(false);
+    expect(sim.step()).toBe(true);
+    expect(sim.done).toBe(true);
+  });
+
+  it('clamps a seek to the steps that exist', () => {
+    const sim = new Simulation({ mode: 'tour', start, seed: 1 });
+    expect(sim.seek(-5)).toBe(0);
+    expect(sim.seek(10_000)).toBe(SIZE * SIZE - 1);
+    expect(sim.seek(Number.NaN)).toBe(0);
+  });
+
+  it('keeps a walk fixed when the cursor goes back and forward again', () => {
+    const sim = new Simulation({ mode: 'walk', start, seed: 12 });
+    for (let i = 0; i < 300; i++) sim.step();
+    const seen = [...sim.path];
+    for (let i = 0; i < 120; i++) sim.back();
+    expect(sim.steps).toBe(180);
+    expect(sim.generated).toBe(300);
+    for (let i = 0; i < 120; i++) sim.step();
+    expect(sim.path).toEqual(seen);
+    const fresh = new Simulation({ mode: 'walk', start, seed: 12 });
+    for (let i = 0; i < 301; i++) fresh.step();
+    sim.step();
+    expect(sim.path).toEqual(fresh.path);
+  });
+
+  it('cannot seek a walk past the steps generated so far', () => {
+    const sim = new Simulation({ mode: 'walk', start, seed: 3 });
+    for (let i = 0; i < 10; i++) sim.step();
+    expect(sim.seek(50)).toBe(10);
+  });
+
+  it('reports the cover step only once the cursor has reached it', () => {
+    const sim = new Simulation({ mode: 'walk', start: { x: 0, y: 0 }, seed: 5, size: 3 });
+    let guard = 0;
+    while (sim.coveredAt === null && guard++ < 5000) sim.step();
+    const at = sim.coveredAt;
+    expect(at).not.toBeNull();
+    sim.seek((at as number) - 1);
+    expect(sim.coveredAt).toBeNull();
+    sim.seek(at as number);
+    expect(sim.coveredAt).toBe(at);
+    expect(sim.visitedCells).toBe(9);
+  });
+
+  it('counts visited cells at the cursor, not at the end', () => {
+    const sim = new Simulation({ mode: 'tour', start, seed: 1 });
+    sim.seek(10);
+    expect(sim.visitedCells).toBe(11);
+  });
+});

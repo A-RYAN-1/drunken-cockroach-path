@@ -252,6 +252,17 @@ dd {
   cursor: pointer;
 }
 
+#board-help {
+  max-width: 70ch;
+}
+
+.text-view .current-move {
+  font-weight: 700;
+  border-left: 3px solid var(--accent);
+  margin-left: -0.6rem;
+  padding-left: 0.5rem;
+}
+
 .text-view ol {
   max-height: 14rem;
   overflow: auto;

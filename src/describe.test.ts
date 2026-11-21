@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LISTED_MOVES, moves, summary } from './describe';
+import { LISTED_MOVES, currentMoveIndex, moves, summary } from './describe';
 import { Simulation } from './sim';
 
 const walk = () => new Simulation({ mode: 'walk', start: { x: 1, y: 1 }, seed: 7, size: 4 });
@@ -51,5 +51,35 @@ describe('moves', () => {
     expect(list).toHaveLength(LISTED_MOVES);
     expect(list[0].startsWith('Step 151:')).toBe(true);
     expect(list[LISTED_MOVES - 1].startsWith('Step 200:')).toBe(true);
+  });
+});
+
+describe('moves around the cursor', () => {
+  it('lists the latest moves at the end and none at the start of a fresh run', () => {
+    const sim = new Simulation({ mode: 'tour', start: { x: 3, y: 4 }, seed: 1 });
+    expect(currentMoveIndex(sim)).toBe(-1);
+    sim.seek(sim.generated);
+    const list = moves(sim);
+    expect(list).toHaveLength(LISTED_MOVES);
+    expect(list[list.length - 1].startsWith('Step 63:')).toBe(true);
+    expect(currentMoveIndex(sim)).toBe(list.length - 1);
+  });
+
+  it('marks the step the cursor is on, with later moves still listed', () => {
+    const sim = new Simulation({ mode: 'tour', start: { x: 3, y: 4 }, seed: 1 });
+    sim.seek(20);
+    const list = moves(sim);
+    const at = currentMoveIndex(sim);
+    expect(list[at].startsWith('Step 20:')).toBe(true);
+    expect(list.length).toBeGreaterThan(at + 1);
+  });
+
+  it('follows the cursor backwards through a walk', () => {
+    const sim = walk();
+    for (let i = 0; i < 200; i++) sim.step();
+    sim.seek(100);
+    expect(moves(sim)[currentMoveIndex(sim)].startsWith('Step 100:')).toBe(true);
+    sim.seek(0);
+    expect(currentMoveIndex(sim)).toBe(-1);
   });
 });

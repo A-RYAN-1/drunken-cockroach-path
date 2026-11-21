@@ -1,7 +1,8 @@
 import './style.css';
 import { draw } from './render';
 import { Simulation, type Mode } from './sim';
-import { moves, summary } from './describe';
+import { currentMoveIndex, moves, summary } from './describe';
+import { DEFAULT_SPEED_INDEX, SPEEDS, actionForKey, speedIndex, speedLabel, stepsPerSecond } from './replay';
 import { coverExperiment, summarise } from './coverage';
 import { MAX_SIZE, MIN_SIZE, SIZE } from './walk';
 
@@ -21,6 +22,9 @@ const speed = $<HTMLInputElement>('speed');
 const speedOut = $('speed-out');
 const playBtn = $<HTMLButtonElement>('play');
 const stepBtn = $<HTMLButtonElement>('step');
+const backBtn = $<HTMLButtonElement>('back');
+const scrubber = $<HTMLInputElement>('scrubber');
+const scrubberOut = $('scrubber-out');
 const message = $('message');
 const textView = $<HTMLDetailsElement>('text-view');
 const modeInputs = document.querySelectorAll<HTMLInputElement>('input[name="mode"]');
@@ -96,17 +100,30 @@ function refresh() {
   playBtn.textContent = running ? 'Pause' : sim.steps > 0 ? 'Resume' : 'Start';
   playBtn.disabled = sim.done;
   stepBtn.disabled = sim.done;
+  backBtn.disabled = sim.steps === 0;
+  scrubber.max = String(sim.generated);
+  scrubber.value = String(sim.steps);
+  scrubber.setAttribute('aria-valuetext', `Step ${sim.steps} of ${sim.generated}`);
+  scrubberOut.textContent = `${sim.steps} / ${sim.generated}`;
 }
 
 function renderText() {
   $('text-summary').textContent = summary(sim);
-  $('text-moves').replaceChildren(
-    ...moves(sim).map((text) => {
+  const list = $('text-moves');
+  const current = currentMoveIndex(sim);
+  list.replaceChildren(
+    ...moves(sim).map((text, i) => {
       const li = document.createElement('li');
       li.textContent = text;
+      if (i === current) {
+        li.setAttribute('aria-current', 'step');
+        li.className = 'current-move';
+      }
       return li;
     }),
   );
+  const row = list.querySelector<HTMLElement>('.current-move');
+  if (row) list.scrollTop = row.offsetTop - list.offsetTop - list.clientHeight / 2;
 }
 
 function stop() {
@@ -116,7 +133,7 @@ function stop() {
 
 function frame(now: number) {
   if (!running) return;
-  owed += ((now - lastFrame) / 1000) * Number(speed.value);
+  owed += ((now - lastFrame) / 1000) * stepsPerSecond(Number(speed.value));
   lastFrame = now;
   const due = Math.min(Math.floor(owed), MAX_STEPS_PER_FRAME);
   owed -= Math.floor(owed);
@@ -191,6 +208,16 @@ stepBtn.addEventListener('click', () => {
   sim.step();
   refresh();
 });
+backBtn.addEventListener('click', () => {
+  stop();
+  sim.back();
+  refresh();
+});
+scrubber.addEventListener('input', () => {
+  stop();
+  sim.seek(Number(scrubber.value));
+  refresh();
+});
 $('reset').addEventListener('click', build);
 $('new-seed').addEventListener('click', () => {
   seedInput.value = String(Math.floor(Math.random() * SEED_RANGE));
@@ -198,9 +225,11 @@ $('new-seed').addEventListener('click', () => {
 });
 modeInputs.forEach((i) => i.addEventListener('change', build));
 [sizeInput, startX, startY, seedInput].forEach((i) => i.addEventListener('change', build));
-speed.addEventListener('input', () => {
-  speedOut.textContent = `${speed.value} steps/s`;
-});
+function showSpeed() {
+  speedOut.textContent = speedLabel(Number(speed.value));
+  speed.setAttribute('aria-valuetext', speedLabel(Number(speed.value)));
+}
+speed.addEventListener('input', showSpeed);
 canvas.addEventListener('click', (e) => {
   const r = canvas.getBoundingClientRect();
   startX.value = String(clamp(Math.floor(((e.clientX - r.left) / r.width) * sim.size), 0, sim.size - 1));
@@ -224,6 +253,22 @@ canvas.addEventListener('keydown', (e) => {
   else return;
   e.preventDefault();
 });
+document.addEventListener('keydown', (e) => {
+  const action = actionForKey(e.key);
+  const target = e.target as HTMLElement;
+  if (!action || e.ctrlKey || e.metaKey || e.altKey || target.closest('input, select, textarea')) return;
+  if (action === 'back') backBtn.click();
+  else if (action === 'forward') stepBtn.click();
+  else if (action === 'start' || action === 'end') {
+    stop();
+    sim.seek(action === 'start' ? 0 : sim.generated);
+    refresh();
+  } else {
+    speed.value = String(speedIndex(Number(speed.value) + (action === 'faster' ? 1 : -1)));
+    showSpeed();
+  }
+  e.preventDefault();
+});
 window.addEventListener('hashchange', () => {
   readHash();
   build();
@@ -232,5 +277,7 @@ window.addEventListener('resize', () => draw(canvas, sim));
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => draw(canvas, sim));
 
 readHash();
-speedOut.textContent = `${speed.value} steps/s`;
+speed.max = String(SPEEDS.length - 1);
+speed.value = String(DEFAULT_SPEED_INDEX);
+showSpeed();
 build();
