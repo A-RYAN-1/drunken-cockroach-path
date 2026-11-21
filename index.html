@@ -60,14 +60,21 @@
           </div>
 
           <div class="row">
+            <label for="scrubber">Replay</label>
+            <input id="scrubber" type="range" min="0" max="0" step="1" value="0" />
+            <output id="scrubber-out" for="scrubber">0 / 0</output>
+          </div>
+
+          <div class="row">
             <label for="speed">Speed</label>
-            <input id="speed" type="range" min="1" max="200" value="8" />
-            <output id="speed-out" for="speed">8 steps/s</output>
+            <input id="speed" type="range" min="0" max="5" step="1" value="2" />
+            <output id="speed-out" for="speed">1x</output>
           </div>
 
           <div class="buttons">
+            <button id="back" type="button" aria-keyshortcuts=",">Back</button>
             <button id="play" type="button" class="primary">Start</button>
-            <button id="step" type="button">Step</button>
+            <button id="step" type="button" aria-keyshortcuts=".">Step</button>
             <button id="reset" type="button">Reset</button>
           </div>
 
@@ -83,6 +90,8 @@
 
       <p id="board-help" class="hint">
         Keyboard: focus the board, then use the arrow keys to move the start cell and Enter or Space to start or pause.
+        Anywhere on the page outside a field: comma steps back, full stop steps forward, Home and End jump to the start
+        and the end, and the left and right square brackets change the speed.
       </p>
       <details id="text-view" class="text-view">
         <summary>Text version of the board</summary>
